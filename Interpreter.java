@@ -18,8 +18,25 @@ class Interpreter {
     }
     
     static String str(String s) {
-        return s.replace("\"", "").replace("\\n", "\n");
-    }
+		String result = "";
+		int i = 0;
+		s = s.replace("\"", "");
+		while (i < s.length()) {
+			if (s.charAt(i) == '\\' && i + 1 < s.length()) {
+				if (s.charAt(i + 1) == 'n') {
+					result += '\n';
+					i += 2;
+				} else if (s.charAt(i) == '\\') {
+					result += '\\';
+					i += 2;
+				} 
+			} else {
+				result += s.charAt(i);
+				i++;
+			}
+		}
+		return result;
+	}
     static boolean itob(int i) {
         return i != 0;
     }
