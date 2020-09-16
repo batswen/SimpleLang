@@ -4,7 +4,7 @@ import java.util.Map;
 import java.util.HashMap;
 
 class Interpreter {
-    Map<String, Integer> globals;
+    Map<String, Variable> globals;
     /*
     List<Variable> vars; = new ArrayList<>();
     List<String> strings; = new ArrayList<>();
@@ -18,40 +18,30 @@ class Interpreter {
     }
     
     static String str(String s) {
-		String result = "";
-		int i = 0;
-		s = s.replace("\"", "");
-		while (i < s.length()) {
-			if (s.charAt(i) == '\\' && i + 1 < s.length()) {
-				if (s.charAt(i + 1) == 'n') {
-					result += '\n';
-					i += 2;
-				} else if (s.charAt(i) == '\\') {
-					result += '\\';
-					i += 2;
-				} 
-			} else {
-				result += s.charAt(i);
-				i++;
-			}
-		}
-		return result;
+        String result = "";
+        int i = 0;
+        s = s.replace("\"", "");
+        while (i < s.length()) {
+            if (s.charAt(i) == '\\' && i + 1 < s.length()) {
+                if (s.charAt(i + 1) == 'n') {
+                    result += '\n';
+                    i += 2;
+                } else if (s.charAt(i) == '\\') {
+                    result += '\\';
+                    i += 2;
+                } 
+            } else {
+                result += s.charAt(i);
+                i++;
+            }
+        }
+        return result;
 	}
     static boolean itob(int i) {
         return i != 0;
     }
     static int btoi(boolean b) {
         return b ? 1 : 0;
-    }
-    int fetch_var(String name) {
-        int result;
-        if (globals.containsKey(name)) {
-            result = globals.get(name);
-        } else {
-            globals.put(name, 0);
-            result = 0;
-        }
-        return result;		
     }
     final int interpret(Node n) throws Exception {
         if (n == null) {
@@ -61,11 +51,23 @@ class Interpreter {
             case nd_Integer:
                 return Integer.parseInt(n.value);
             case nd_Ident:
-                return fetch_var(n.value);
+                if (globals.containsKey(n.value)) {
+                    return globals.get(n.value).getIntVar();
+                } else {
+                    throw new Exception("Variable " + n.value + " not found!");
+                }
             case nd_String:
                 return 1;//n.value;
             case nd_Assign:
-                globals.put(n.left.value, interpret(n.right));
+                Variable var;
+                String name = n.left.value;
+                if (globals.containsKey(name)) {
+                    var = globals.get(name);
+                } else {
+                    var = new Variable(VarType.INT);
+                    globals.put(name, var);
+                }
+                var.setIntVar(interpret(n.right));
                 return 0;
             case nd_Add:
                 return interpret(n.left) + interpret(n.right);

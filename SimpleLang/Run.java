@@ -1,10 +1,3 @@
-/**
- * Rosetta code lexer/parser/interpreter
- * in a single jar
- * 
- * mostly translated from python source
- */
-
 package com.batswen.simplelang;
 
 import static com.batswen.simplelang.Lexer.error;
